@@ -10,5 +10,22 @@ typedef unsigned short int byte_2;
 #define IO_FA  0x2000
 #define IO_LA  0x3fff
 
+enum ADR
+{
+    ZP , //zero page
+    ZPX , //zero page X
+    ZPY , //zero page Y
+    ABS , //absolute
+    ABSX , //absolute X
+    ABSY , //absolute Y
+    IND , //indirect 
+    IMP , //implied
+    ACC , //accoumulator
+    IMM , //immediate
+    REL , //relative 
+    IIX , //indexed indirect
+    IIY //indirect indexed
+}
+
 
 #endif

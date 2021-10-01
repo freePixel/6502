@@ -12,7 +12,8 @@ void bus::write(byte_2 adress , byte data)
     if(adress < 0x2000)  //ram adress
     {
         _ram->write(adress , data);
-        //RAM IS MIRRORED THREE TIMES
+        
+        //Memory locations $0000-$07FF are mirrored three times at $0800-$1FFF
         _ram->write(adress + 0x0800 , data);
         _ram->write(adress + 0x1000 , data);
         _ram->write(adress + 0x1800 , data);

@@ -13,10 +13,15 @@ class cpu
     private:
         int wait_cycles; //wait cycles after executing an instruction
 
-        //instructions
-        
-        void BRK(); void ORA(); void ADC(byte opcode);
+        //!!! INSTRUCTIONS !!!
+        //there are 151  official opcodes
+        void BRK();
+        void ORA();
 
+
+        void read_from_bus(byte adressing_mode);
+
+        byte OPCODE; //current opcode being processed
 
         //registers
         byte A;         //accumulator

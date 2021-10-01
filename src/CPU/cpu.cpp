@@ -20,16 +20,9 @@ void cpu::rising_edge_clk()
     if(wait_cycles > 0) wait_cycles--;
     else{
         //execute intructio
-        byte instruction;
-        switch(instruction)
-        {
-            case 0x00:
-            BRK();
-            break;
-            case 0x01:
-            ADC(instruction);
-            break;
-        }
+        OPCODE = _bus->read(PC);
+        if(OPCODE == 0x00) BRK();
+        if(OPCODE == 0x01) ORA();
         
     }
 }
@@ -37,12 +30,17 @@ void cpu::rising_edge_clk()
 
 //INSTRUCTIONS FUNCTIONS
 
-void ADC(byte instruction)
+void cpu::ORA()
 {
-    switch(instruction)
+    ADR MODE;
+    switch(OPCODE)
     {
-        case 0x69: //immediate mode
-        
+        case 0x09:
+        MODE = ADR::IMM;
+        PC += 2;
+        wait_cycles = 2;
         break;
+        case 0x05:
+        A = A | _bus->
     }
 }
