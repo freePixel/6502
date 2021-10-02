@@ -1,5 +1,7 @@
 #include "ram.h"
 
+
+
 void ram::write(byte_2 adress , byte data)
 {
     memory[adress] = data;

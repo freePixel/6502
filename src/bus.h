@@ -1,8 +1,6 @@
 #ifndef BUS_H
 #define BUS_H
 
-
-
 #include "ram.h"
 #include "definitions.h"
 class bus
@@ -14,7 +12,7 @@ class bus
     void write(byte_2 adress , byte data);
     private:
 
-    ram* _ram = nullptr;
+    ram _ram;
 
     byte data;
     byte_2 adress;

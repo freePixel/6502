@@ -27,5 +27,12 @@ enum ADR
     INDY //indirect indexed
 };
 
+struct instruction
+{
+    ADR mode;
+    byte length;
+    byte clock_cycles;
+};
+
 
 #endif

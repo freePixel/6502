@@ -2,7 +2,8 @@
 #define CPU_H
 
 #include <array>
-#include "../bus.h"
+#include "bus.h"
+#include <map>
 
 class cpu
 {
@@ -11,6 +12,9 @@ class cpu
     void rising_edge_clk();
     
     private:
+
+        static std::map<byte , instruction> op_code_map; //dictionary used to store all opcode info
+
         int wait_cycles; //wait cycles after executing an instruction
         bool extra_cycle = false; // if page boundary is crossed (X + RAM(PC+1) > 0xFF)
 
@@ -20,6 +24,7 @@ class cpu
         void BRK();
         void ORA();
         void NOP();
+        void ASL();
 
 
 

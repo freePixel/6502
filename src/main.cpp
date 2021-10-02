@@ -1,8 +1,12 @@
 #include <iostream>
-#include "CPU/cpu.h"
+#include "cpu.h"
 
 int main()
 {
-    std::cout << "Hello world" << "\n";
-    
+    bus* _bus = new bus();
+    cpu* CPU = new cpu(_bus);
+
+
+    delete _bus;
+    delete CPU;
 }
