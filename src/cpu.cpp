@@ -31,7 +31,10 @@ std::map<byte,instruction> cpu::opcode_map =
     {0xd0,{REL,2}},
     {0x10,{REL,2}},
     {0x50,{REL,2}},
-    {0x70,{REL,2}}
+    {0x70,{REL,2}},
+
+    {0x24 , {ZP,3}},
+    {0x2c , {ABS,4}}
 
 
 
@@ -72,11 +75,13 @@ void cpu::rising_edge_clk()
             case 0x90:BCC();break;
             case 0xb0:BCS();break;
             case 0xf0:BEQ();break;
+            case 0x24:case 0x2c: BIT(); break;
             case 0x30:BMI();break;
             case 0xd0:BNE();break;
             case 0x10:BPL();break;
             case 0x50:BVC();break;
             case 0x70:BVS();break;
+
             
         }
         

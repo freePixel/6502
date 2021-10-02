@@ -33,11 +33,13 @@ class cpu
         void BCC(){branch_group(0, true);}
         void BCS(){branch_group(0, false);}
         void BEQ(){branch_group(1, true);}
+        void BIT();
         void BMI(){branch_group(7, true);}
         void BNE(){branch_group(1, false);}
         void BPL(){branch_group(7, false);}
         void BVC(){branch_group(6, false);}
         void BVS(){branch_group(6, true);}
+
 
 
 
