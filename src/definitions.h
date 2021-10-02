@@ -10,6 +10,7 @@ typedef unsigned short int byte_2;
 #define IO_FA  0x2000
 #define IO_LA  0x3fff
 
+
 enum ADR
 {
     ZP , //zero page
@@ -30,8 +31,8 @@ enum ADR
 struct instruction
 {
     ADR mode;
-    byte length;
     byte clock_cycles;
+    
 };
 
 

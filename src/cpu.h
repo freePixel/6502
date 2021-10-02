@@ -13,20 +13,20 @@ class cpu
     
     private:
 
-        static std::map<byte , instruction> op_code_map; //dictionary used to store all opcode info
+        static std::map<byte , instruction> opcode_map; //dictionary used to store all opcode info
+        static std::map<ADR , byte> instruction_size;
 
         int wait_cycles; //wait cycles after executing an instruction
         bool extra_cycle = false; // if page boundary is crossed (X + RAM(PC+1) > 0xFF)
 
-        byte find_value_by_mode(ADR adressing_mode); // WARNING!: this function will update PC and wait_cloks variables
+        byte find_operator_by_mode(ADR adressing_mode); // WARNING!: this function will update PC and wait_cloks variables
         //!!! INSTRUCTIONS !!!
         //there are 151  official opcodes
         void BRK();
         void ORA();
         void NOP();
         void ASL();
-
-
+        void ADC();
 
         byte OPCODE; //current opcode being processed
 

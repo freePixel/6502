@@ -1,10 +1,26 @@
 #include "cpu.h"
 
-
-std::map<byte,instruction> cpu::op_code_map = 
+std::map<ADR , byte> cpu::instruction_size =
 {
-    
-   
+    {ADR::ACC , 1},
+    {ADR::ABS , 3},
+    {ADR::ABSX,3},
+    {ADR::ABSY,3},
+    {ADR::IMM,2},
+    {ADR::IMP,1},
+    {ADR::IND,3},
+    {ADR::INDX,3},
+    {ADR::INDY,3},
+    {ADR::REL,2},
+    {ADR::ZP,2},
+    {ADR::ZPX,2},
+    {ADR::ZPY,2}
+};
+
+std::map<byte,instruction> cpu::opcode_map =
+{
+    {0x69 , {IMM , 2}},{0x65,{ZP,3}},{0x75,{ZPX,4}},{0x6d,{ABS,4}},{0x7d,{ABSX,4}},{0x79,{ABSY,4}},{0x61,{INDX,6}},{0x71,{INDY,5}}  //ADC       
+
 
 
 };
@@ -38,23 +54,27 @@ void cpu::rising_edge_clk()
         OPCODE = _bus->read(PC);
         switch(OPCODE)
         {
-            case 0x00: BRK(); break;
-            case 0x01: ORA(); break;
-            case 0x05: ORA(); break;
-            case 0x06: ASL(); break;
+            case 0x69:
+            case 0x65:
+            case 0x75:
+            case 0x6d:
+            case 0x7d:
+            case 0x79:
+            case 0x61:
+            case 0x71:
+            ADC();
+            break;
         }
         
-        instruction info = op_code_map[OPCODE];
-
-        
+        instruction info = opcode_map[OPCODE];
         wait_cycles = info.clock_cycles;
-        PC += info.length; //increase PC
+        PC += instruction_size[info.mode];
 
     }
 }
 
 
-byte cpu::find_value_by_mode(ADR adressing_mode)
+byte cpu::find_operator_by_mode(ADR adressing_mode)
 {
 
     byte read;
@@ -112,16 +132,30 @@ byte cpu::find_value_by_mode(ADR adressing_mode)
         if(intermediate_adress > 0x00FF) extra_cycle = true;
         read = _bus->read(intermediate_adress + 256 * _bus->read(data_memory_adress + 1));
         break;
+
+        case ADR::ACC:
+        read = A;
+        break;
     }
     return read;
 }
 
 //INSTRUCTIONS FUNCTIONS
 
+void cpu::ADC()
+{
+    instruction info = opcode_map[OPCODE];
+    byte oper = find_operator_by_mode(info.mode);
+    A = A + oper + (P & 0x01);
+    if(A & 0x80 == 0x80) P = P | 0x80; //negative
+    if(A == 0x00) P = P | 0x02; //zero
+    
+}
+
 void cpu::ORA()
 {
-    instruction info = op_code_map[OPCODE];
-    byte oper = find_value_by_mode(info.mode);
+    instruction info = opcode_map[OPCODE];
+    byte oper = find_operator_by_mode(info.mode);
     A = A | oper;
     //update flags N,Z
     if(A & 0x80 == 0x80) P = P | 0x80; //negative
@@ -137,7 +171,7 @@ void cpu::NOP()
 
 void cpu::BRK()
 {
-    
+
 }
 
 void cpu::ASL()
