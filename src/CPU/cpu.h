@@ -19,7 +19,7 @@ class cpu
         //there are 151  official opcodes
         void BRK();
         void ORA();
-
+        void NOP();
 
 
 

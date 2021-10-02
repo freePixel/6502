@@ -153,3 +153,9 @@ void cpu::ORA()
     
 
 }
+
+void cpu::NOP()
+{
+    wait_cycles = 2;
+    PC++;
+}
