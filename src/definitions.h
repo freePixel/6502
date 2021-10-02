@@ -23,8 +23,8 @@ enum ADR
     ACC , //accoumulator
     IMM , //immediate
     REL , //relative 
-    IIX , //indexed indirect
-    IIY //indirect indexed
+    IXI , //indexed indirect
+    IIX //indirect indexed
 }
 
 
