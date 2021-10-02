@@ -22,7 +22,16 @@ std::map<byte,instruction> cpu::opcode_map =
     {0x69 , {IMM , 2}},{0x65,{ZP,3}},{0x75,{ZPX,4}},{0x6d,{ABS,4}},{0x7d,{ABSX,4}},{0x79,{ABSY,4}},{0x61,{INDX,6}},{0x71,{INDY,5}},  //ADC
     {0x29,{IMM,2}},{0x25,{ZP,3}},{0x35,{ZPX,4}},{0x2d,{ABS,4}},{0x3d,{ABSX,4}},{0x39,{ABSY,4}},{0x21,{INDX,6}},{0x31,{INDY,5}},
     {0x0a,{ACC,2}},{0x06,{ZP,5}},{0x16,{ZPX,6}},{0x0e,{ABS,6}},{0x1e,{ABSX,7}},
-    {0x90,{REL,2}}
+
+    //branch instructions (relative)
+    {0x90,{REL,2}},
+    {0xb0,{REL,2}},
+    {0xf0,{REL,2}},
+    {0x30,{REL,2}},
+    {0xd0,{REL,2}},
+    {0x10,{REL,2}},
+    {0x50,{REL,2}},
+    {0x70,{REL,2}}
 
 
 
@@ -53,7 +62,7 @@ void cpu::rising_edge_clk()
         return;
     }
     else{
-        //execute intructio
+        //execute intruction
         OPCODE = _bus->read(PC);
         switch(OPCODE)
         {
@@ -61,6 +70,13 @@ void cpu::rising_edge_clk()
             case 0x29:case 0x25:case 0x35:case 0x2d:case 0x3d:case 0x39:case 0x21:case 0x31:AND();break;
             case 0x0a:case 0x06:case 0x16:case 0x0e:case 0x1e:ASL();break;
             case 0x90:BCC();break;
+            case 0xb0:BCS();break;
+            case 0xf0:BEQ();break;
+            case 0x30:BMI();break;
+            case 0xd0:BNE();break;
+            case 0x10:BPL();break;
+            case 0x50:BVC();break;
+            case 0x70:BVS();break;
             
         }
         
@@ -225,26 +241,19 @@ void cpu::ASL()
     
 }
 
-void cpu::BCC()
+void cpu::branch_group(byte flag_bit, bool expected_value)
 {
-    if(ACTIVE_BIT(P , 0))
+    bool activated = ACTIVE_BIT(P , flag_bit);
+    if(activated == expected_value)
     {
         byte oper = _bus->read(PC + 1);
         PC = PC + (signed char)oper + 2;
-
         if(((byte_2)PC & 0x00ff) + (signed char)oper + (byte_2)2 > 0x00ff) wait_cycles += 2;
-
     }
     else{
         PC += 2;
     }
 }
-
-
-
-
-
-
 
 
 
