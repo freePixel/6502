@@ -56,48 +56,64 @@ void cpu::rising_edge_clk()
 
 byte cpu::find_value_by_mode(ADR adressing_mode)
 {
+
+    byte read;
+    byte r1;
+    byte_2 data_memory_adress;
+    byte_2 intermediate_adress;
+
     switch(adressing_mode)
     {
         case ADR::ZP:
-        return _bus->read((byte_2)_bus->read(PC + 1));
+        read = _bus->read((byte_2)_bus->read(PC + 1));
+        break;
 
         case ADR::ZPX:
-        return _bus->read((byte_2)_bus->read(PC + 1) + (byte_2)X);
+        read = _bus->read((byte_2)_bus->read(PC + 1) + (byte_2)X);
+        break;
 
         case ADR::ZPY:   
-        return _bus->read(((byte_2)_bus->read(PC + 1)) + (byte_2)Y);
+        read = _bus->read(((byte_2)_bus->read(PC + 1)) + (byte_2)Y);
+        break;
 
         case ADR::ABS:
-        return _bus->read(((byte_2)_bus->read(PC + 1) + 256 * (byte_2)_bus->read(PC + 2)));
+        read = _bus->read(((byte_2)_bus->read(PC + 1) + 256 * (byte_2)_bus->read(PC + 2)));
+        break;
 
         case ADR::ABSX:
-        byte_2 r1 = _bus->read((byte_2)_bus->read(PC+1) + X);
+        r1 = _bus->read((byte_2)_bus->read(PC+1) + X);
         if(r1 > 0x00FF) extra_cycle = true;
-        return _bus->read(r1 + (byte_2)_bus->read(PC+2)*256);
+        read = _bus->read(r1 + (byte_2)_bus->read(PC+2)*256);
+        break;
 
         case ADR::ABSY:
-        byte_2 r2 = _bus->read((byte_2)_bus->read(PC+1) + Y);
-        if(r2 > 0x00FF) extra_cycle = true;
-        return _bus->read(r2 + (byte_2)_bus->read(PC+2)*256);
+        r1 = _bus->read((byte_2)_bus->read(PC+1) + Y);
+        if(r1 > 0x00FF) extra_cycle = true;
+        read = _bus->read(r1 + (byte_2)_bus->read(PC+2)*256);
+        break;
 
         case ADR::IND:
-        byte_2 data_memory_adress = _bus->read( _bus->read(PC+2) * 256 + byte_2(_bus->read(PC+1)));
-        return _bus->read(_bus->read(data_memory_adress) * 256 + _bus->read(data_memory_adress + 1));
+        data_memory_adress = _bus->read( _bus->read(PC+2) * 256 + byte_2(_bus->read(PC+1)));
+        read = _bus->read(_bus->read(data_memory_adress) * 256 + _bus->read(data_memory_adress + 1));
+        break;
 
         case ADR::IMM:
-        return _bus->read(PC + 1);
+        read = _bus->read(PC + 1);
+        break;
 
         case ADR::INDX:
-        byte_2 data_memory_adress = (byte_2)_bus->read(PC + 1) + (byte_2)X;
-        return _bus->read(256 * _bus->read(data_memory_adress) + data_memory_adress + Y);
+        data_memory_adress = (byte_2)_bus->read(PC + 1) + (byte_2)X;
+        read = _bus->read(256 * _bus->read(data_memory_adress) + data_memory_adress + Y);
+        break;
 
         case ADR::INDY:
-        
-        byte_2 data_memory_adress = (byte_2)_bus->read(PC+1);
-        byte_2 intermediate_adress = _bus->read(data_memory_adress) + Y;
+        data_memory_adress = (byte_2)_bus->read(PC+1);
+        intermediate_adress = _bus->read(data_memory_adress) + Y;\
         if(intermediate_adress > 0x00FF) extra_cycle = true;
-        return _bus->read(intermediate_adress + 256 * _bus->read(data_memory_adress + 1));
+        read = _bus->read(intermediate_adress + 256 * _bus->read(data_memory_adress + 1));
+        break;
     }
+    return read;
 }
 
 //INSTRUCTIONS FUNCTIONS
@@ -115,6 +131,11 @@ void cpu::ORA()
 }
 
 void cpu::NOP()
+{
+    
+}
+
+void cpu::BRK()
 {
     
 }
