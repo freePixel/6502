@@ -17,7 +17,12 @@ cpu::cpu(bus* _bus)
 
 void cpu::rising_edge_clk()
 {
-    if(wait_cycles > 0) wait_cycles--;
+    if(wait_cycles > 0)
+    {
+        wait_cycles--;
+        return;
+    }
+    if(extra_cycle) extra_cycle = false;
     else{
         //execute intructio
         OPCODE = _bus->read(PC);
@@ -28,19 +33,71 @@ void cpu::rising_edge_clk()
 }
 
 
+byte cpu::find_value_by_mode(ADR adressing_mode)
+{
+    switch(adressing_mode)
+    {
+        case ZP:
+        PC += 2;
+        return _bus->read((byte_2)_bus->read(PC + 1));
+
+        case ZPX:
+        PC += 2;
+        return _bus->read((byte_2)_bus->read(PC + 1)) + (byte_2)X);
+        case ZPY:
+        PC += 2;
+        return _bus->read(((byte_2)_bus->read(PC + 1)) + (byte_2)Y);
+
+        case ABS:
+        PC += 3;
+        return _bus->read(((byte_2)_bus->read(PC + 1) + 256 * (byte_2)_bus->read(PC + 2)));
+
+        case ABSX:
+        PC += 3;
+        byte_2 r1 = _bus->read((byte_2)_bus->read(PC+1) + X);
+        if(r1 > 0x00FF) extra_cycle = true;
+        return _bus->read(r1 + (byte_2)_bus->read(PC+2)*256);
+
+        case ABSY:
+        PC += 3;
+        byte_2 r1 = _bus->read((byte_2)_bus->read(PC+1) + Y);
+        if(r1 > 0x00FF) extra_cycle = true;
+        return _bus->read(r1 + (byte_2)_bus->read(PC+2)*256);
+
+        case IND:
+        PC += 3;
+        byte_2 data_memory_adress = _bus->read( _bus->read(PC+2) * 256 + byte_2(_bus->read(PC+1)));
+        return _bus->read(_bus->read(data_memory_adress) * 256 + _bus->read(data_memory_adress + 1));
+    }
+}
+
 //INSTRUCTIONS FUNCTIONS
 
 void cpu::ORA()
 {
-    ADR MODE;
     switch(OPCODE)
     {
         case 0x09:
-        MODE = ADR::IMM;
+        A = A | _bus->read(PC + 1);
         PC += 2;
         wait_cycles = 2;
         break;
         case 0x05:
-        A = A | _bus->
+        A = A | _bus->read(_bus->read(PC+1));
+        PC += 2;
+        wait_cycles = 3;
+        case 0x15:
+        A = A | _bus->read(_bus->read(PC+1) + X);
+        PC += 2;
+        wait_cycles = 4;
+        case 0x0d:
+        A = A | _bus->read(_bus->read(PC+1) + _bus->read(PC+2) * 256);
+        PC += 3;
+        wait_cycles = 4;
+        case 0x1d:
+        A = A | _bus->read(_bus->read(PC+1) + _bus->read(PC+2) * 256 + X);
+        if(_bus->read(PC+1) + X )
+        break;
     }
+
 }

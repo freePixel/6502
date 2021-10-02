@@ -12,14 +12,16 @@ class cpu
     
     private:
         int wait_cycles; //wait cycles after executing an instruction
+        bool extra_cycle = false; // if page boundary is crossed (X + RAM(PC+1) > 0xFF)
 
+        byte find_value_by_mode(ADR adressing_mode); // WARNING!: this function will update PC and wait_cloks variables
         //!!! INSTRUCTIONS !!!
         //there are 151  official opcodes
         void BRK();
         void ORA();
 
 
-        void read_from_bus(byte adressing_mode);
+
 
         byte OPCODE; //current opcode being processed
 
