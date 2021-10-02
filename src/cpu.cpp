@@ -21,7 +21,8 @@ std::map<byte,instruction> cpu::opcode_map =
 {
     {0x69 , {IMM , 2}},{0x65,{ZP,3}},{0x75,{ZPX,4}},{0x6d,{ABS,4}},{0x7d,{ABSX,4}},{0x79,{ABSY,4}},{0x61,{INDX,6}},{0x71,{INDY,5}},  //ADC
     {0x29,{IMM,2}},{0x25,{ZP,3}},{0x35,{ZPX,4}},{0x2d,{ABS,4}},{0x3d,{ABSX,4}},{0x39,{ABSY,4}},{0x21,{INDX,6}},{0x31,{INDY,5}},
-    {0x0a,{ACC,2}},{0x06,{ZP,5}},{0x16,{ZPX,6}},{0x0e,{ABS,6}},{0x1e,{ABSX,7}}
+    {0x0a,{ACC,2}},{0x06,{ZP,5}},{0x16,{ZPX,6}},{0x0e,{ABS,6}},{0x1e,{ABSX,7}},
+    {0x90,{REL,2}}
 
 
 
@@ -40,57 +41,32 @@ cpu::cpu(bus* _bus)
     S = 0;
     P = 0;
     wait_cycles = 0;
-    increase_pc = true;
 }
 
 
 
 void cpu::rising_edge_clk()
 {
-    increase_pc = true;
     if(wait_cycles > 0)
     {
         wait_cycles--;
         return;
     }
-    if(extra_cycle) extra_cycle = false;
     else{
         //execute intructio
         OPCODE = _bus->read(PC);
         switch(OPCODE)
         {
-            case 0x69:
-            case 0x65:
-            case 0x75:
-            case 0x6d:
-            case 0x7d:
-            case 0x79:
-            case 0x61:
-            case 0x71:
-            ADC();
-            break;
-            case 0x29:
-            case 0x25:
-            case 0x35:
-            case 0x2d:
-            case 0x3d:
-            case 0x39:
-            case 0x21:
-            case 0x31:
-            AND();
-            break;
-            case 0x0a:
-            case 0x06:
-            case 0x16:
-            case 0x0e:
-            case 0x1e:
-            ASL();
+            case 0x69:case 0x65:case 0x75:case 0x6d:case 0x7d:case 0x79:case 0x61:case 0x71:ADC();break;
+            case 0x29:case 0x25:case 0x35:case 0x2d:case 0x3d:case 0x39:case 0x21:case 0x31:AND();break;
+            case 0x0a:case 0x06:case 0x16:case 0x0e:case 0x1e:ASL();break;
+            case 0x90:BCC();break;
             
         }
         
         instruction info = opcode_map[OPCODE];
-        wait_cycles = info.clock_cycles;
-        if(increase_pc) PC += instruction_size[info.mode];
+        wait_cycles += info.clock_cycles;
+        PC += instruction_size[info.mode];
 
     }
 }
@@ -134,13 +110,13 @@ byte_2 cpu::find_adress_by_mode(ADR adressing_mode)
 
         case ADR::ABSX:
         r1 = _bus->read((byte_2)_bus->read(PC+1) + X);
-        if(r1 > 0x00FF) extra_cycle = true;
+        if(r1 > 0x00FF) wait_cycles += 1;
         read = r1 + (byte_2)_bus->read(PC+2)*256;
         break;
 
         case ADR::ABSY:
         r1 = _bus->read((byte_2)_bus->read(PC+1) + Y);
-        if(r1 > 0x00FF) extra_cycle = true;
+        if(r1 > 0x00FF) wait_cycles += 1;
         read = r1 + (byte_2)_bus->read(PC+2)*256;
         break;
 
@@ -161,7 +137,7 @@ byte_2 cpu::find_adress_by_mode(ADR adressing_mode)
         case ADR::INDY:
         data_memory_adress = (byte_2)_bus->read(PC+1);
         intermediate_adress = _bus->read(data_memory_adress) + Y;
-        if(intermediate_adress > 0x00FF) extra_cycle = true;
+        if(intermediate_adress > 0x00FF) wait_cycles += 1;
         read = intermediate_adress + 256 * _bus->read(data_memory_adress + 1);
         break;
     }
@@ -248,6 +224,43 @@ void cpu::ASL()
     }
     
 }
+
+void cpu::BCC()
+{
+    if(ACTIVE_BIT(P , 0))
+    {
+        byte oper = _bus->read(PC + 1);
+        PC = PC + (signed char)oper + 2;
+
+        if(((byte_2)PC & 0x00ff) + (signed char)oper + (byte_2)2 > 0x00ff) wait_cycles += 2;
+
+    }
+    else{
+        PC += 2;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void cpu::ORA()
 {

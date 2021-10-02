@@ -17,7 +17,6 @@ class cpu
         static std::map<ADR , byte> instruction_size;
 
         int wait_cycles; //wait cycles after executing an instruction
-        bool extra_cycle = false; // if page boundary is crossed (X + RAM(PC+1) > 0xFF)
 
         byte find_operator_by_mode(ADR adressing_mode); // WARNING!: this function will update PC and wait_cloks variables
         byte_2 find_adress_by_mode(ADR adressing_mode);
@@ -25,18 +24,17 @@ class cpu
         void generate_NCZ_flags(byte enable_flag , byte_2 result);
         void generate_overflow_flag(byte OP1 , byte OP2);
         //!!! INSTRUCTIONS !!!
-        //there are 151  official opcodes
+        //there are 151  official opcodes and 56 different instructions
         void ADC();
         void AND();
         void ASL();
-
+        void BCC();
 
         void BRK();
         void ORA();
         void NOP();
 
         byte OPCODE; //current opcode being processed
-        bool increase_pc;
 
         //registers
         byte A;         //accumulator
