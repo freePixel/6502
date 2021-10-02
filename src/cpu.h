@@ -20,6 +20,10 @@ class cpu
         bool extra_cycle = false; // if page boundary is crossed (X + RAM(PC+1) > 0xFF)
 
         byte find_operator_by_mode(ADR adressing_mode); // WARNING!: this function will update PC and wait_cloks variables
+        byte_2 find_adress_by_mode(ADR adressing_mode);
+
+        void generate_NCZ_flags(byte enable_flag , byte_2 result);
+        void generate_overflow_flag(byte OP1 , byte OP2);
         //!!! INSTRUCTIONS !!!
         //there are 151  official opcodes
         void ADC();

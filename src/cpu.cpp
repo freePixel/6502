@@ -95,11 +95,21 @@ void cpu::rising_edge_clk()
     }
 }
 
-
 byte cpu::find_operator_by_mode(ADR adressing_mode)
 {
+    if(adressing_mode == ADR::ACC)
+    {
+        return A;
+    }
+    else{
+        return _bus->read(find_adress_by_mode(adressing_mode));
+    }
+}
 
-    byte read;
+byte_2 cpu::find_adress_by_mode(ADR adressing_mode)
+{
+
+    byte_2 read;
     byte r1;
     byte_2 data_memory_adress;
     byte_2 intermediate_adress;
@@ -107,36 +117,36 @@ byte cpu::find_operator_by_mode(ADR adressing_mode)
     switch(adressing_mode)
     {
         case ADR::ZP:
-        read = _bus->read((byte_2)_bus->read(PC + 1));
+        read = (byte_2)_bus->read(PC + 1);
         break;
 
         case ADR::ZPX:
-        read = _bus->read((byte_2)_bus->read(PC + 1) + (byte_2)X);
+        read = (byte_2)_bus->read(PC + 1) + (byte_2)X;
         break;
 
         case ADR::ZPY:   
-        read = _bus->read(((byte_2)_bus->read(PC + 1)) + (byte_2)Y);
+        read = ((byte_2)_bus->read(PC + 1)) + (byte_2)Y;
         break;
 
         case ADR::ABS:
-        read = _bus->read(((byte_2)_bus->read(PC + 1) + 256 * (byte_2)_bus->read(PC + 2)));
+        read = ((byte_2)_bus->read(PC + 1) + 256 * (byte_2)_bus->read(PC + 2));
         break;
 
         case ADR::ABSX:
         r1 = _bus->read((byte_2)_bus->read(PC+1) + X);
         if(r1 > 0x00FF) extra_cycle = true;
-        read = _bus->read(r1 + (byte_2)_bus->read(PC+2)*256);
+        read = r1 + (byte_2)_bus->read(PC+2)*256;
         break;
 
         case ADR::ABSY:
         r1 = _bus->read((byte_2)_bus->read(PC+1) + Y);
         if(r1 > 0x00FF) extra_cycle = true;
-        read = _bus->read(r1 + (byte_2)_bus->read(PC+2)*256);
+        read = r1 + (byte_2)_bus->read(PC+2)*256;
         break;
 
         case ADR::IND:
         data_memory_adress = _bus->read( _bus->read(PC+2) * 256 + byte_2(_bus->read(PC+1)));
-        read = _bus->read(_bus->read(data_memory_adress) * 256 + _bus->read(data_memory_adress + 1));
+        read = _bus->read(data_memory_adress) * 256 + _bus->read(data_memory_adress + 1);
         break;
 
         case ADR::IMM:
@@ -145,23 +155,56 @@ byte cpu::find_operator_by_mode(ADR adressing_mode)
 
         case ADR::INDX:
         data_memory_adress = (byte_2)_bus->read(PC + 1) + (byte_2)X;
-        read = _bus->read(256 * _bus->read(data_memory_adress) + data_memory_adress + Y);
+        read = 256 * _bus->read(data_memory_adress) + data_memory_adress + Y;
         break;
 
         case ADR::INDY:
         data_memory_adress = (byte_2)_bus->read(PC+1);
         intermediate_adress = _bus->read(data_memory_adress) + Y;
         if(intermediate_adress > 0x00FF) extra_cycle = true;
-        read = _bus->read(intermediate_adress + 256 * _bus->read(data_memory_adress + 1));
-        break;
-
-        case ADR::ACC:
-        read = A;
+        read = intermediate_adress + 256 * _bus->read(data_memory_adress + 1);
         break;
     }
     return read;
 }
 
+
+void cpu::generate_NCZ_flags(byte enable_flag , byte_2 result)
+{
+    //check for c flag
+    if(ACTIVE_BIT(enable_flag , 0))
+    {
+        if(ACTIVE_BIT(result , 8)) P |= 0x01;
+        else{
+            P &= 0xfe;
+        }
+    }
+    //zero flag
+    if(ACTIVE_BIT(enable_flag , 1))
+    {
+        if(result == 0x0000) P |= 0x10;
+        else{
+            P &= 0xfd;
+        }
+    }
+    //negative flag
+    if(ACTIVE_BIT(enable_flag , 7))
+    {
+        if(ACTIVE_BIT(result,7)) P |= 0x80;
+        else{
+            P &= 0x7f;
+        }
+    }
+}
+
+void cpu::generate_overflow_flag(byte OP1 , byte OP2)
+{
+    byte total = OP1 + OP2;
+    if(total < OP1) P |= 0x40;
+    else{
+        P &= 0xbf;
+    }
+}
 
 
 //INSTRUCTIONS FUNCTIONS
@@ -172,16 +215,10 @@ void cpu::ADC()
     byte oper = find_operator_by_mode(info.mode);
     byte carry = P & 0x01;
     byte_2 result = A + oper + carry;
-    
-    if (result > 0x00ff) P |= 0x01;
-    {
-        //overflow  and carry detected
-        P |= 0x41;
-    }
-    A = (byte)(result % 256);
 
-    if(A & 0x80 == 0x80) P = P | 0x80; //negative
-    if(A == 0x00) P = P | 0x02; //zero
+    generate_overflow_flag(A , oper + 1); //warning!! possible bug
+    generate_NCZ_flags(0x83 , result);
+    A = (byte)(result % 256);
     
 }
 
@@ -190,10 +227,27 @@ void cpu::AND()
     instruction info = opcode_map[OPCODE];
     byte oper = find_operator_by_mode(info.mode);
     A &= oper;
-    if(A & 0x80 == 0x80) P = P | 0x80; //negative
-    if(A == 0x00) P = P | 0x02; //zero
+    generate_NCZ_flags(0x82 , (byte_2)A);
 }
 
+void cpu::ASL()
+{
+    instruction info = opcode_map[OPCODE];
+    
+    if(info.mode == ACC)
+    {
+        A = A << 1;
+        generate_NCZ_flags(0x83 , (byte_2)A);
+    }
+    else{
+        byte_2 adress = find_adress_by_mode(info.mode);
+        byte oper = _bus->read(adress);
+        oper = oper << 1;
+        _bus->write(adress , oper);
+        generate_NCZ_flags(0x83 , (byte_2)oper);
+    }
+    
+}
 
 void cpu::ORA()
 {
@@ -207,10 +261,6 @@ void cpu::ORA()
 
 }
 
-void cpu::ASL()
-{
-    
-}
 
 void cpu::NOP()
 {

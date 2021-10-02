@@ -10,6 +10,8 @@ typedef unsigned short int byte_2;
 #define IO_FA  0x2000
 #define IO_LA  0x3fff
 
+#define ACTIVE_BIT(var,pos) ((var) & (1<<(pos))) //check if bit at pos is active
+
 
 enum ADR
 {
