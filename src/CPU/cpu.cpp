@@ -3,7 +3,7 @@
 cpu::cpu(bus* _bus)
 {
     //set all registers to 0
-    this->_bus = _bus;
+    this->_bus = _bus; //connect bus to 6502
     A = 0;
     X = 0;
     Y = 0;
@@ -83,7 +83,7 @@ byte cpu::find_value_by_mode(ADR adressing_mode)
         case ADR::INDX:
         byte_2 data_memory_adress = (byte_2)_bus->read(PC + 1) + (byte_2)X;
         PC += 2;
-        return final_adress = _bus->read(256 * _bus->read(data_memory_adress) + data_memory_adress + Y);
+        return _bus->read(256 * _bus->read(data_memory_adress) + data_memory_adress + Y);
 
         case ADR::INDY:
         
@@ -99,37 +99,57 @@ byte cpu::find_value_by_mode(ADR adressing_mode)
 
 void cpu::ORA()
 {
-    /*
-    switch(OPCODE)
-    {
-        case 0x09:
-        A = A | _bus->read(PC + 1);
-        PC += 2;
-        wait_cycles = 2;
-        break;
-        case 0x05:
-        A = A | _bus->read(_bus->read(PC+1));
-        PC += 2;
-        wait_cycles = 3;
-        case 0x15:
-        A = A | _bus->read(_bus->read(PC+1) + X);
-        PC += 2;
-        wait_cycles = 4;
-        case 0x0d:
-        A = A | _bus->read(_bus->read(PC+1) + _bus->read(PC+2) * 256);
-        PC += 3;
-        wait_cycles = 4;
-        case 0x1d:
-        A = A | _bus->read(_bus->read(PC+1) + _bus->read(PC+2) * 256 + X);
-        if(_bus->read(PC+1) + X )
-        break;
-    }
-    */
+
+    ADR MODE;
     switch(OPCODE)
     {
         case 0x09: 
+        MODE = ADR::IMM;
+        wait_cycles = 2;
+        break;
 
+        case 0x05:
+        MODE = ADR::ZP;
+        wait_cycles = 3;
+        break;
+
+        case 0x15:
+        MODE = ADR::ZPX;
+        wait_cycles = 4;
+        break;
+
+        case 0x0d:
+        MODE = ADR::ABS;
+        wait_cycles = 4;
+        break;
+
+        case 0x1d:
+        MODE = ADR::ABSX;
+        wait_cycles = 4;
+        break;
+
+        case 0x19:
+        MODE = ADR::ABSY;
+        wait_cycles = 4;
+        break;
+
+        case 0x01:
+        MODE = ADR::INDX;
+        wait_cycles = 6;
+        break;
+
+        case 0x11:
+        MODE = ADR::INDY;
+        wait_cycles = 5;
         break;
     }
+
+    byte oper = find_value_by_mode(MODE);
+    A = A | oper;
+
+    //update flags N,Z
+    if(A & 0x80 == 0x80) P = P | 0x80; //negative
+    if(A == 0X00) P = P | 0x02; //zero
+    
 
 }
