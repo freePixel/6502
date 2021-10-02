@@ -22,12 +22,14 @@ class cpu
         byte find_operator_by_mode(ADR adressing_mode); // WARNING!: this function will update PC and wait_cloks variables
         //!!! INSTRUCTIONS !!!
         //there are 151  official opcodes
+        void ADC();
         void AND();
+        void ASL();
+
+
         void BRK();
         void ORA();
         void NOP();
-        void ASL();
-        void ADC();
 
         byte OPCODE; //current opcode being processed
         bool increase_pc;

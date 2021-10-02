@@ -20,7 +20,8 @@ std::map<ADR , byte> cpu::instruction_size =
 std::map<byte,instruction> cpu::opcode_map =
 {
     {0x69 , {IMM , 2}},{0x65,{ZP,3}},{0x75,{ZPX,4}},{0x6d,{ABS,4}},{0x7d,{ABSX,4}},{0x79,{ABSY,4}},{0x61,{INDX,6}},{0x71,{INDY,5}},  //ADC
-    {0x29,{IMM,2}},{0x25,{ZP,3}},{0x35,{ZPX,4}},{0x2d,{ABS,4}},{0x3d,{ABSX,4}},{0x39,{ABSY,4}},{0x21,{INDX,6}},{0x31,{INDY,5}}
+    {0x29,{IMM,2}},{0x25,{ZP,3}},{0x35,{ZPX,4}},{0x2d,{ABS,4}},{0x3d,{ABSX,4}},{0x39,{ABSY,4}},{0x21,{INDX,6}},{0x31,{INDY,5}},
+    {0x0a,{ACC,2}},{0x06,{ZP,5}},{0x16,{ZPX,6}},{0x0e,{ABS,6}},{0x1e,{ABSX,7}}
 
 
 
@@ -78,6 +79,13 @@ void cpu::rising_edge_clk()
             case 0x31:
             AND();
             break;
+            case 0x0a:
+            case 0x06:
+            case 0x16:
+            case 0x0e:
+            case 0x1e:
+            ASL();
+            
         }
         
         instruction info = opcode_map[OPCODE];
@@ -199,6 +207,11 @@ void cpu::ORA()
 
 }
 
+void cpu::ASL()
+{
+    
+}
+
 void cpu::NOP()
 {
     
@@ -207,9 +220,4 @@ void cpu::NOP()
 void cpu::BRK()
 {
 
-}
-
-void cpu::ASL()
-{
-    
 }
