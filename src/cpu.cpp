@@ -75,7 +75,14 @@ std::map<byte,instruction> cpu::opcode_map =
     {0x2a,{ACC,2}},{0x26,{ZP,5}},{0x36,{ZPX,6}},{0x2e,{ABS,6}},{0x3e,{ABSX,7}},
     {0x6a,{ACC,2}},{0x66,{ZP,5}},{0x76,{ZPX,6}},{0x6e,{ABS,6}},{0x7e,{ABSX,7}},
     {0x40,{IMP,6}},
-    {0x60,{IMP,6}}
+    {0x60,{IMP,6}},
+
+    {0xe9,{IMM,2}},{0xe5,{ZP,3}},{0xf5,{ZPX,4}},{0xed,{ABS,4}},{0xfd,{ABSX,4}},{0xf9,{ABSY,4}},{0xe1,{INDX,6}},{0xf1,{INDY,5}},
+    {0x38,{IMP,2}},
+    {0x78,{IMP,2}},
+    {0x85,{ZP,3}},{0x95,{ZPX,3}},{0x8d,{ABS,4}},{0x9d,{ABSX,5}},{0x99,{ABSY,5}},{0x81,{INDX,6}},{0x91,{INDY,6}},
+    {0x86,{ZPX,3}},{0x96,{ZPY,4}},{0x8e,{ABS,4}},
+    {0x84,{ZP,3}},{0x94,{ZPX,4}},{0x8c,{ABS,4}}
 
 
 
@@ -152,7 +159,14 @@ void cpu::rising_edge_clk()
             case 0x2a:case 0x26:case 0x36:case 0x2e:case 0x3e:ROL();break;
             case 0x6a:case 0x66:case 0x76:case 0x6e:case 0x7e:ROR();break;
             case 0x40:RTI();break;
-            case 0x0x60:RTS();break; 
+            case 0x60:RTS();break; 
+            case 0xe9:case 0xe5:case 0xf5:case 0fed:case 0xfd:case 0xf9:case 0xe1:case 0xf1:SBC();break;
+            case 0x38:SEC();break;
+            case 0xf8:SED();break;
+            case 0x78:SEI();break;
+            case 0x85:case 0x95:case 0x8d:case 0x9d:case 0x99:case 0x81:case 0x91:STA();break;
+            case 0x86:case 0x96:case 0x8e:STX();break;
+            case 0x84:case 0x94:case 0x8c:STY();break;
             
         }
         
@@ -588,3 +602,32 @@ void cpu::RTS()
     PC = (byte_2)pc1 * (byte_2)256 + (byte_2)pc2;
 }
 
+void cpu::SBC()
+{
+
+}
+
+void cpu::SEC()
+{
+
+}
+
+void cpu::SED()
+{
+
+}
+
+void cpu::STA()
+{
+
+}
+
+void cpu::STX()
+{
+
+}
+
+void cpu::STY()
+{
+    
+}

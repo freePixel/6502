@@ -84,7 +84,14 @@ class cpu
         void ROR();
         void RTI();
         void RTS();
-        
+
+        void SBC();
+        void SEC();
+        void SED();
+        void SEI();
+        void STA();
+        void STX();
+        void STY();
 
         byte OPCODE; //current opcode being processed
 
