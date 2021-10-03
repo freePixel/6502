@@ -40,6 +40,7 @@ class cpu
         void BMI(){branch_group(7, true);}
         void BNE(){branch_group(1, false);}
         void BPL(){branch_group(7, false);}
+        void BRK();
         void BVC(){branch_group(6, false);}
         void BVS(){branch_group(6, true);}
 
@@ -56,9 +57,13 @@ class cpu
         void DEX();
         void DEY();
 
+        void EOR();
+        
+        void INC();
+        void INX();
+        void INY();
 
 
-        void BRK();
         void ORA();
         void NOP();
 

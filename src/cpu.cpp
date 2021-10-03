@@ -47,7 +47,13 @@ std::map<byte,instruction> cpu::opcode_map =
 
     {0xc6,{ZP,5}},{0xd6,{ZPX,6}},{0xce,{ABS,6}},{0xde,{ABSX,7}},
     {0xca,{IMP,2}},
-    {0x88,{IMP,2}}
+    {0x88,{IMP,2}},
+
+    {0x49,{IMM,2}},{0x45,{ZP,3}},{0x55,{ZPX,4}},{0x4d,{ABS,4}},{0x5d,{ABSX,4}},{0x59,{ABSY,4}},{0x41,{INDX,6}},{0x51,{INDY,5}},
+
+    {0xe6,{ZP,5}},{0xf6,{ZPX,6}},{0xee,{ABS,6}},{0xfe,{ABSX,7}},
+    {0xe8,{IMP,2}},
+    {0xc8,{IMP,2}}
 
 
 };
@@ -103,6 +109,10 @@ void cpu::rising_edge_clk()
             case 0xc6:case 0xd6:case 0xc3:case 0xde:DEC();break;
             case 0xca:DEX();break;
             case 0x88:DEY();break;
+            case 0x49:case 0x45:case 0x55:case 0x4d:case 0x5d:case 0x59:case 0x41:case 0x51:EOR();break;
+            case 0xe6:case 0xf6:case 0xee:case 0xfe:INC();
+            case 0xe8:INX();break;
+            case 0xc8:INY();break;
 
             
         }
@@ -356,7 +366,34 @@ void cpu::DEY()
     generate_NCZ_flags(0x82,Y);
 }
 
+void cpu::EOR()
+{
+    byte oper = find_operator_by_mode(opcode_map[OPCODE].mode);
+    byte result = A ^ oper;
+    A = result;
+    generate_NCZ_flags(0x82,(byte_2)A);
+}
 
+void cpu::INC()
+{
+    byte_2 adress = find_adress_by_mode(opcode_map[OPCODE].mode);
+    byte oper = _bus->read(adress);
+    oper++;
+    _bus->write(adress , oper);
+    generate_NCZ_flags(0x82, oper);
+}
+
+void cpu::INX()
+{
+    X++;
+    generate_NCZ_flags(0x82,X);
+}
+
+void cpu::INY()
+{
+    Y++;
+    generate_NCZ_flags(0x82,Y);
+}
 
 
 
