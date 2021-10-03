@@ -52,7 +52,9 @@ class cpu
         void CPX();
         void CPY();
 
-
+        void DEC();
+        void DEX();
+        void DEY();
 
 
 

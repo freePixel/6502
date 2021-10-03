@@ -43,7 +43,11 @@ std::map<byte,instruction> cpu::opcode_map =
     {0xc9,{IMM,2}},{0xc5,{ZP,3}},{0xd5,{ZPX,4}},{0xcd,{ABS,4}},{0xdd,{ABSX,4}},{0xd9,{ABSY,4}},{0xc1,{INDX,6}},{0xd1,{INDY,5}},
 
     {0xe0,{IMM,2}},{0xe4,{ZP,3}},{0xec,{ABS,4}},
-    {0xc0,{IMM,2}},{0xc4,{ZP,3}},{0xcc,{ABS,4}}
+    {0xc0,{IMM,2}},{0xc4,{ZP,3}},{0xcc,{ABS,4}},
+
+    {0xc6,{ZP,5}},{0xd6,{ZPX,6}},{0xce,{ABS,6}},{0xde,{ABSX,7}},
+    {0xca,{IMP,2}},
+    {0x88,{IMP,2}}
 
 
 };
@@ -96,6 +100,9 @@ void cpu::rising_edge_clk()
             case 0xc9:case 0xc5:case 0xd5:case 0xcd:case 0xdd:case 0xd9:case 0xc1:case 0xd1:CMP();break;
             case 0xe0:case 0xe4:case 0xec:CPX();break;
             case 0xc0:case 0xc4:case 0xcc:CPY();break;
+            case 0xc6:case 0xd6:case 0xc3:case 0xde:DEC();break;
+            case 0xca:DEX();break;
+            case 0x88:DEY();break;
 
             
         }
@@ -328,9 +335,26 @@ void cpu::CPY()
     generate_NCZ_flags(0x83,result);
 }
 
+void cpu::DEC()
+{
+    byte_2 adress = find_adress_by_mode(opcode_map[OPCODE].mode);
+    byte oper = _bus->read(adress);
+    oper--;
+    _bus->write(adress , oper);
+    generate_NCZ_flags(0x82, oper);
+}
 
+void cpu::DEX()
+{
+    X--;
+    generate_NCZ_flags(0x82,X);
+}
 
-
+void cpu::DEY()
+{
+    Y--;
+    generate_NCZ_flags(0x82,Y);
+}
 
 
 
