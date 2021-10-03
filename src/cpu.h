@@ -25,7 +25,7 @@ class cpu
         void generate_overflow_flag(byte OP1 , byte OP2);
 
         void push_stack(byte value);
-        void pop_stack();
+        byte pop_stack();
         //!!! INSTRUCTIONS !!!
         //there are 151  official opcodes and 56 different instructions
         void ADC();
@@ -71,9 +71,14 @@ class cpu
         void LDY();
         void LSR();
 
+        void NOP(){};
 
         void ORA();
-        void NOP();
+
+        void PHA();
+        void PHP();
+        void PLA();
+        void PLP();
 
         byte OPCODE; //current opcode being processed
 

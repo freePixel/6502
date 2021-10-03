@@ -61,7 +61,18 @@ std::map<byte,instruction> cpu::opcode_map =
     {0xa9,{IMM,2}},{0xa5,{ZP,3}},{0xb5,{ZPX,4}},{0xad,{ABS,4}},{0xbd,{ABSX,4}},{0xb9,{ABSY,4}},{0xa1,{INDX,6}},{0xb1,{INDY,5}},
     {0xa2,{IMM,2}},{0xa6,{ZP,3}},{0xb6,{ZPY,4}},{0xae,{ABS,4}},{0xbe,{ABSY,4}},
     {0xa0,{IMM,2}},{0xa4,{ZP,3}},{0xb4,{ZPX,4}},{0xac,{ABS,4}},{0xbc,{ABSX,4}},
-    {0x4a,{ACC,2}},{0x46,{ZP,5}},{0x56,{ZPX,6}},{0x4e,{ABS,6}},{0x5e,{ABSX,7}}
+    {0x4a,{ACC,2}},{0x46,{ZP,5}},{0x56,{ZPX,6}},{0x4e,{ABS,6}},{0x5e,{ABSX,7}},
+
+    {0xea,{IMP,2}},
+
+    {0x09,{IMM,2}},{0x05,{ZP,3}},{0x15,{ZPX,4}},{0x0d,{ABS,4}},{0x1d,{ABSX,4}},{0x19,{ABSY,4}},{0x01,{INDX,6}},{0x11,{INDY,5}},
+
+    {0x48,{IMP,3}},
+    {0x08,{IMP,3}},
+    {0x68,{IMP,4}},
+    {0x28,{IMP,4}}
+
+
 
 
 };
@@ -127,7 +138,12 @@ void cpu::rising_edge_clk()
             case 0xa2:case 0xa6:case 0xb6:case 0xae:case 0xbe:LDX();break;
             case 0xa0:case 0xa4:case 0xb4:case 0xac:case 0xbc:LDY();break;
             case 0x4a:case 0x46:case 0x56:case 0x4e:case 0x5e:LSR();break;
-
+            case 0xea:NOP();break;
+            case 0x09:case 0x05:case 0x15:case 0x0d:case 0x1d:case 0x19:case 0x01:case 0x11:ORA();break;
+            case 0x48:PHA();break;
+            case 0x08:PHP();break;
+            case 0x68:PLA();break;
+            case 0x28:PLP();break;
             
         }
         
@@ -255,9 +271,11 @@ void cpu::push_stack(byte value)
     S--;
 }
 
-void cpu::pop_stack()
+byte cpu::pop_stack()
 {
+    byte ret = _bus->read((byte_2)0x100 + (byte_2)S);
     S++;
+    return ret;
 }
 
 //INSTRUCTIONS FUNCTIONS
@@ -461,29 +479,31 @@ void cpu::LSR()
     }
 }
 
-
-
-
-
-
-
-
-
 void cpu::ORA()
 {
     instruction info = opcode_map[OPCODE];
     byte oper = find_operator_by_mode(info.mode);
     A = A | oper;
-    //update flags N,Z
-    if(A & 0x80 == 0x80) P = P | 0x80; //negative
-    if(A == 0X00) P = P | 0x02; //zero
-    
-
+    generate_NCZ_flags(0x82, A);
 }
 
-
-void cpu::NOP()
+void cpu::PHA()
 {
-    
+    push_stack(A);
 }
 
+void cpu::PHP()
+{
+    push_stack(P);
+}
+
+void cpu::PLA()
+{
+    A = pop_stack();
+    generate_NCZ_flags(0x82, A);
+}
+
+void cpu::PLP()
+{
+    P = pop_stack();
+}
