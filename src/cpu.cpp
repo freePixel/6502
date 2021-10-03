@@ -33,8 +33,8 @@ std::map<byte,instruction> cpu::opcode_map =
     {0x50,{REL,2}},
     {0x70,{REL,2}},
 
-    {0x24 , {ZP,3}},
-    {0x2c , {ABS,4}}
+    {0x24 , {ZP,3}},{0x2c , {ABS,4}}
+
 
 
 
@@ -260,6 +260,14 @@ void cpu::branch_group(byte flag_bit, bool expected_value)
     }
 }
 
+void cpu::BIT()
+{
+    byte oper = find_operator_by_mode(opcode_map[this->OPCODE].mode);
+    if(ACTIVE_BIT(oper , 7)) P |= 0x80;
+    if(ACTIVE_BIT(oper , 6)) P |= 0x40;
+    
+    if(A && oper) P |= 0x02;
+}
 
 
 
