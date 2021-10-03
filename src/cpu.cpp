@@ -53,7 +53,9 @@ std::map<byte,instruction> cpu::opcode_map =
 
     {0xe6,{ZP,5}},{0xf6,{ZPX,6}},{0xee,{ABS,6}},{0xfe,{ABSX,7}},
     {0xe8,{IMP,2}},
-    {0xc8,{IMP,2}}
+    {0xc8,{IMP,2}},
+
+    {0x4c,{ABS,3}},{0x6c,{IND,5}}
 
 
 };
@@ -113,6 +115,7 @@ void cpu::rising_edge_clk()
             case 0xe6:case 0xf6:case 0xee:case 0xfe:INC();
             case 0xe8:INX();break;
             case 0xc8:INY();break;
+            case 0x4c:case 0x6c:JMP();break;
 
             
         }
@@ -394,6 +397,21 @@ void cpu::INY()
     Y++;
     generate_NCZ_flags(0x82,Y);
 }
+
+void cpu::JMP()
+{
+    byte_2 adress = find_adress_by_mode(opcode_map[OPCODE].mode);
+    PC = adress;
+}
+
+
+
+
+
+
+
+
+
 
 
 

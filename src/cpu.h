@@ -63,6 +63,8 @@ class cpu
         void INX();
         void INY();
 
+        void JMP();
+
 
         void ORA();
         void NOP();
