@@ -56,7 +56,12 @@ std::map<byte,instruction> cpu::opcode_map =
     {0xc8,{IMP,2}},
 
     {0x4c,{ABS,3}},{0x6c,{IND,5}},
-    {0x20,{ABS,6}}
+    {0x20,{ABS,6}},
+
+    {0xa9,{IMM,2}},{0xa5,{ZP,3}},{0xb5,{ZPX,4}},{0xad,{ABS,4}},{0xbd,{ABSX,4}},{0xb9,{ABSY,4}},{0xa1,{INDX,6}},{0xb1,{INDY,5}},
+    {0xa2,{IMM,2}},{0xa6,{ZP,3}},{0xb6,{ZPY,4}},{0xae,{ABS,4}},{0xbe,{ABSY,4}},
+    {0xa0,{IMM,2}},{0xa4,{ZP,3}},{0xb4,{ZPX,4}},{0xac,{ABS,4}},{0xbc,{ABSX,4}},
+    {0x4a,{ACC,2}},{0x46,{ZP,5}},{0x56,{ZPX,6}},{0x4e,{ABS,6}},{0x5e,{ABSX,7}}
 
 
 };
@@ -118,6 +123,10 @@ void cpu::rising_edge_clk()
             case 0xc8:INY();break;
             case 0x4c:case 0x6c:JMP();break;
             case 0x20:JSR();break;
+            case 0xa9:case 0xa5:case 0xb5:case 0xad:case 0xbd:case 0xb9:case 0xa1:case 0xb1:LDA();break;
+            case 0xa2:case 0xa6:case 0xb6:case 0xae:case 0xbe:LDX();break;
+            case 0xa0:case 0xa4:case 0xb4:case 0xac:case 0xbc:LDY();break;
+            case 0x4a:case 0x46:case 0x56:case 0x4e:case 0x5e:LSR();break;
 
             
         }
@@ -416,7 +425,41 @@ void cpu::JSR()
 
 }
 
+void cpu::LDA()
+{
+    A = find_operator_by_mode(opcode_map[OPCODE].mode);
+    generate_NCZ_flags(0x82,A);
+}
 
+void cpu::LDX()
+{
+    X = find_operator_by_mode(opcode_map[OPCODE].mode);
+    generate_NCZ_flags(0x82,X);
+}
+
+void cpu::LDY()
+{
+    Y = find_operator_by_mode(opcode_map[OPCODE].mode);
+    generate_NCZ_flags(0x82,Y);
+}
+
+void cpu::LSR()
+{
+    instruction info = opcode_map[OPCODE];
+    
+    if(info.mode == ACC)
+    {
+        A = A >> 1;
+        generate_NCZ_flags(0x83 , (byte_2)A);
+    }
+    else{
+        byte_2 adress = find_adress_by_mode(info.mode);
+        byte oper = _bus->read(adress);
+        oper = oper >> 1;
+        _bus->write(adress , oper);
+        generate_NCZ_flags(0x83 , (byte_2)oper);
+    }
+}
 
 
 

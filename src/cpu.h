@@ -66,6 +66,11 @@ class cpu
         void JMP();
         void JSR();
 
+        void LDA();
+        void LDX();
+        void LDY();
+        void LSR();
+
 
         void ORA();
         void NOP();
