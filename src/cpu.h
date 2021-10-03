@@ -48,7 +48,7 @@ class cpu
         void CLI(){P &= 0xfb;}
         void CLV(){P &= 0xbf;}
 
-
+        void CMP();
 
 
 
