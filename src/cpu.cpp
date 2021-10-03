@@ -40,9 +40,10 @@ std::map<byte,instruction> cpu::opcode_map =
     {0xd8,{IMP,2}},
     {0x58,{IMP,2}},
 
-    {0xc9,{IMM,2}},{0xc5,{ZP,3}},{0xd5,{ZPX,4}},{0xcd,{ABS,4}},{0xdd,{ABSX,4}},{0xd9,{ABSY,4}},{0xc1,{INDX,6}},{0xd1,{INDY,5}}
+    {0xc9,{IMM,2}},{0xc5,{ZP,3}},{0xd5,{ZPX,4}},{0xcd,{ABS,4}},{0xdd,{ABSX,4}},{0xd9,{ABSY,4}},{0xc1,{INDX,6}},{0xd1,{INDY,5}},
 
-
+    {0xe0,{IMM,2}},{0xe4,{ZP,3}},{0xec,{ABS,4}},
+    {0xc0,{IMM,2}},{0xc4,{ZP,3}},{0xcc,{ABS,4}}
 
 
 };
@@ -92,6 +93,9 @@ void cpu::rising_edge_clk()
             case 0xd8:CLD();break;
             case 0x58:CLI();break;
             case 0xb8:CLV();break;
+            case 0xc9:case 0xc5:case 0xd5:case 0xcd:case 0xdd:case 0xd9:case 0xc1:case 0xd1:CMP();break;
+            case 0xe0:case 0xe4:case 0xec:CPX();break;
+            case 0xc0:case 0xc4:case 0xcc:CPY();break;
 
             
         }
@@ -306,11 +310,23 @@ void cpu::BRK()
 void cpu::CMP()
 {
     byte oper = find_operator_by_mode(opcode_map[OPCODE].mode);
-
     byte_2 result = (byte_2)A - (byte_2)oper;
     generate_NCZ_flags(0x83,result);
 }
 
+void cpu::CPX()
+{
+    byte oper = find_operator_by_mode(opcode_map[OPCODE].mode);
+    byte_2 result = (byte_2)X - (byte_2)oper;
+    generate_NCZ_flags(0x83,result);
+}
+
+void cpu::CPY()
+{
+    byte oper = find_operator_by_mode(opcode_map[OPCODE].mode);
+    byte_2 result = (byte_2)Y - (byte_2)oper;
+    generate_NCZ_flags(0x83,result);
+}
 
 
 

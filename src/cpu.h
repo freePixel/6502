@@ -49,6 +49,8 @@ class cpu
         void CLV(){P &= 0xbf;}
 
         void CMP();
+        void CPX();
+        void CPY();
 
 
 
