@@ -43,6 +43,8 @@ class cpu
         void BVC(){branch_group(6, false);}
         void BVS(){branch_group(6, true);}
 
+        void CLC(){P &= 0xfe;}
+        void CLV(){P &= 0xbf;}
 
 
 

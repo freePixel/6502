@@ -34,7 +34,9 @@ std::map<byte,instruction> cpu::opcode_map =
     {0x70,{REL,2}},
 
     {0x24 , {ZP,3}},{0x2c , {ABS,4}},
-    {0x00 , {IMP,7}}
+    {0x00 , {IMP,7}},
+    {0x18,{IMP,2}},
+    {0xb8,{IMP,2}}
 
 
 
@@ -83,6 +85,8 @@ void cpu::rising_edge_clk()
             case 0x00:BRK();break;
             case 0x50:BVC();break;
             case 0x70:BVS();break;
+            case 0x18:CLC();break;
+            case 0xb8:CLV();break;
 
             
         }
@@ -292,8 +296,6 @@ void cpu::BRK()
     PC = 0xfffe;
     P |= 0x04;
 }
-
-
 
 
 
