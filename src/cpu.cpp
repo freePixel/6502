@@ -70,7 +70,12 @@ std::map<byte,instruction> cpu::opcode_map =
     {0x48,{IMP,3}},
     {0x08,{IMP,3}},
     {0x68,{IMP,4}},
-    {0x28,{IMP,4}}
+    {0x28,{IMP,4}},
+
+    {0x2a,{ACC,2}},{0x26,{ZP,5}},{0x36,{ZPX,6}},{0x2e,{ABS,6}},{0x3e,{ABSX,7}},
+    {0x6a,{ACC,2}},{0x66,{ZP,5}},{0x76,{ZPX,6}},{0x6e,{ABS,6}},{0x7e,{ABSX,7}},
+    {0x40,{IMP,6}},
+    {0x60,{IMP,6}}
 
 
 
@@ -144,6 +149,10 @@ void cpu::rising_edge_clk()
             case 0x08:PHP();break;
             case 0x68:PLA();break;
             case 0x28:PLP();break;
+            case 0x2a:case 0x26:case 0x36:case 0x2e:case 0x3e:ROL();break;
+            case 0x6a:case 0x66:case 0x76:case 0x6e:case 0x7e:ROR();break;
+            case 0x40:RTI();break;
+            case 0x0x60:RTS();break; 
             
         }
         
@@ -507,3 +516,75 @@ void cpu::PLP()
 {
     P = pop_stack();
 }
+
+void cpu::ROL()
+{
+    ADR mode = opcode_map[OPCODE].mode;
+    byte_2 adress;
+    byte oper;
+    if(mode != ACC)
+    {
+        adress = find_adress_by_mode(mode);
+        oper = _bus->read(adress);
+    }
+    else{
+        oper = A;
+    }
+
+    bool last_bit = ACTIVE_BIT(oper , 7);
+    oper = oper << 1;
+    if(last_bit) oper |= 0x01;
+    byte_2 result = (byte_2)oper;
+    if(last_bit) result |= 0x0100;
+    
+    if(mode == ACC) A = oper;
+    else{
+        _bus->write(adress , oper);
+    }
+    generate_NCZ_flags(0x83 , result);
+}
+
+void cpu::ROR()
+{
+    ADR mode = opcode_map[OPCODE].mode;
+    byte_2 adress;
+    byte oper;
+    if(mode != ACC)
+    {
+        adress = find_adress_by_mode(mode);
+        oper = _bus->read(adress);
+    }
+    else{
+        oper = A;
+    }
+
+    bool first_bit = ACTIVE_BIT(oper , 0);
+    oper = oper >> 1;
+    if(first_bit) oper |= 0x80;
+    byte_2 result = (byte_2)oper;
+    if(first_bit) result |= 0x0100;
+    
+    if(mode == ACC) A = oper;
+    else{
+        _bus->write(adress , oper);
+    }
+    generate_NCZ_flags(0x83 , result);
+}
+
+void cpu::RTI()
+{
+    P = pop_stack();
+    byte pc1 = pop_stack();
+    byte pc2 = pop_stack();
+
+    PC = (byte_2)pc1 * (byte_2)256 + (byte_2)pc2;
+}
+
+void cpu::RTS()
+{
+    byte pc1 = pop_stack();
+    byte pc2 = pop_stack();
+
+    PC = (byte_2)pc1 * (byte_2)256 + (byte_2)pc2;
+}
+

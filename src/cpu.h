@@ -80,6 +80,12 @@ class cpu
         void PLA();
         void PLP();
 
+        void ROL();
+        void ROR();
+        void RTI();
+        void RTS();
+        
+
         byte OPCODE; //current opcode being processed
 
         //registers
