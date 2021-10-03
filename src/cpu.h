@@ -64,6 +64,7 @@ class cpu
         void INY();
 
         void JMP();
+        void JSR();
 
 
         void ORA();

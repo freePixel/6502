@@ -55,7 +55,8 @@ std::map<byte,instruction> cpu::opcode_map =
     {0xe8,{IMP,2}},
     {0xc8,{IMP,2}},
 
-    {0x4c,{ABS,3}},{0x6c,{IND,5}}
+    {0x4c,{ABS,3}},{0x6c,{IND,5}},
+    {0x20,{ABS,6}}
 
 
 };
@@ -116,6 +117,7 @@ void cpu::rising_edge_clk()
             case 0xe8:INX();break;
             case 0xc8:INY();break;
             case 0x4c:case 0x6c:JMP();break;
+            case 0x20:JSR();break;
 
             
         }
@@ -404,6 +406,15 @@ void cpu::JMP()
     PC = adress;
 }
 
+void cpu::JSR()
+{
+    byte_2 ret = PC + 2;
+    push_stack((byte)(ret >> 8));
+    push_stack((byte)(ret % 256));
+    
+    PC = find_adress_by_mode(ABS);
+
+}
 
 
 
