@@ -33,7 +33,8 @@ std::map<byte,instruction> cpu::opcode_map =
     {0x50,{REL,2}},
     {0x70,{REL,2}},
 
-    {0x24 , {ZP,3}},{0x2c , {ABS,4}}
+    {0x24 , {ZP,3}},{0x2c , {ABS,4}},
+    {0x00 , {IMP,7}}
 
 
 
@@ -50,7 +51,7 @@ cpu::cpu(bus* _bus)
     X = 0;
     Y = 0;
     PC = 0;
-    S = 0;
+    S = 0xff;
     P = 0;
     wait_cycles = 0;
 }
@@ -79,6 +80,7 @@ void cpu::rising_edge_clk()
             case 0x30:BMI();break;
             case 0xd0:BNE();break;
             case 0x10:BPL();break;
+            case 0x00:BRK();break;
             case 0x50:BVC();break;
             case 0x70:BVS();break;
 
@@ -203,6 +205,16 @@ void cpu::generate_overflow_flag(byte OP1 , byte OP2)
     }
 }
 
+void cpu::push_stack(byte value)
+{
+    _bus->write((byte_2)0x100 + (byte_2)S , value);
+    S--;
+}
+
+void cpu::pop_stack()
+{
+    S++;
+}
 
 //INSTRUCTIONS FUNCTIONS
 
@@ -269,6 +281,17 @@ void cpu::BIT()
     if(A && oper) P |= 0x02;
 }
 
+void cpu::BRK()
+{
+
+    byte_2  result = PC+2;
+    push_stack((byte)(result >> 8));
+    push_stack((byte)(result % 256));
+    push_stack(P);
+
+    PC = 0xfffe;
+    P |= 0x04;
+}
 
 
 
@@ -302,7 +325,3 @@ void cpu::NOP()
     
 }
 
-void cpu::BRK()
-{
-
-}

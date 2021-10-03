@@ -23,6 +23,9 @@ class cpu
 
         void generate_NCZ_flags(byte enable_flag , byte_2 result);
         void generate_overflow_flag(byte OP1 , byte OP2);
+
+        void push_stack(byte value);
+        void pop_stack();
         //!!! INSTRUCTIONS !!!
         //there are 151  official opcodes and 56 different instructions
         void ADC();
