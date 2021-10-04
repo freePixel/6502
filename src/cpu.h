@@ -86,9 +86,9 @@ class cpu
         void RTS();
 
         void SBC();
-        void SEC();
-        void SED();
-        void SEI();
+        void SEC(){P |= 0x01;}
+        void SED(){P |= 0x08;}
+        void SEI(){P |= 0x04;}
         void STA();
         void STX();
         void STY();

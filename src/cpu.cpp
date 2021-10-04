@@ -604,30 +604,28 @@ void cpu::RTS()
 
 void cpu::SBC()
 {
-
-}
-
-void cpu::SEC()
-{
-
-}
-
-void cpu::SED()
-{
-
+    byte oper = find_operator_by_mode(opcode_map[OPCODE].mode);
+    byte_2 result = (byte_2)A + (byte_2)oper + (byte_2)(P & 0x01);
+    A = (byte)(result >> 8);
+    generate_NCZ_flags(0x83 , result);
+    generate_overflow_flag((byte_2)A + (byte_2)(P & 0x01) , (byte_2)oper);
+    
 }
 
 void cpu::STA()
 {
-
+    byte_2 adress = find_adress_by_mode(opcode_map[OPCODE].mode);
+    _bus->write(adress , A);
 }
 
 void cpu::STX()
 {
-
+    byte_2 adress = find_adress_by_mode(opcode_map[OPCODE].mode);
+    _bus->write(adress , X);
 }
 
 void cpu::STY()
 {
-    
+    byte_2 adress = find_adress_by_mode(opcode_map[OPCODE].mode);
+    _bus->write(adress , Y);
 }
