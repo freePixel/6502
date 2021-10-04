@@ -93,6 +93,13 @@ class cpu
         void STX();
         void STY();
 
+        void TAX();
+        void TAY();
+        void TSX();
+        void TXA();
+        void TXS();
+        void TYA();
+
         byte OPCODE; //current opcode being processed
 
         //registers

@@ -82,10 +82,14 @@ std::map<byte,instruction> cpu::opcode_map =
     {0x78,{IMP,2}},
     {0x85,{ZP,3}},{0x95,{ZPX,3}},{0x8d,{ABS,4}},{0x9d,{ABSX,5}},{0x99,{ABSY,5}},{0x81,{INDX,6}},{0x91,{INDY,6}},
     {0x86,{ZPX,3}},{0x96,{ZPY,4}},{0x8e,{ABS,4}},
-    {0x84,{ZP,3}},{0x94,{ZPX,4}},{0x8c,{ABS,4}}
+    {0x84,{ZP,3}},{0x94,{ZPX,4}},{0x8c,{ABS,4}},
 
-
-
+    {0xaa,{IMP,2}},
+    {0xa8,{IMP,2}},
+    {0xba,{IMP,2}},
+    {0x8a,{IMP,2}},
+    {0x9a,{IMP,2}},
+    {0x98,{IMP,2}}
 
 };
 
@@ -160,13 +164,19 @@ void cpu::rising_edge_clk()
             case 0x6a:case 0x66:case 0x76:case 0x6e:case 0x7e:ROR();break;
             case 0x40:RTI();break;
             case 0x60:RTS();break; 
-            case 0xe9:case 0xe5:case 0xf5:case 0fed:case 0xfd:case 0xf9:case 0xe1:case 0xf1:SBC();break;
+            case 0xe9:case 0xe5:case 0xf5:case 0xed:case 0xfd:case 0xf9:case 0xe1:case 0xf1:SBC();break;
             case 0x38:SEC();break;
             case 0xf8:SED();break;
             case 0x78:SEI();break;
             case 0x85:case 0x95:case 0x8d:case 0x9d:case 0x99:case 0x81:case 0x91:STA();break;
             case 0x86:case 0x96:case 0x8e:STX();break;
             case 0x84:case 0x94:case 0x8c:STY();break;
+            case 0xaa:TAX();break;
+            case 0xa8:TAY();break;
+            case 0xba:TSX();break;
+            case 0x8a:TXA();break;
+            case 0x9a:TSX();break;
+            case 0x98:TYA();break;
             
         }
         
@@ -628,4 +638,39 @@ void cpu::STY()
 {
     byte_2 adress = find_adress_by_mode(opcode_map[OPCODE].mode);
     _bus->write(adress , Y);
+}
+
+void cpu::TAX()
+{
+    X = A;
+    generate_NCZ_flags(0x82 , X);
+}
+
+void cpu::TAY()
+{
+    Y = A;
+    generate_NCZ_flags(0x82 , Y);
+}
+
+void cpu::TSX()
+{
+    X = S;
+    generate_NCZ_flags(0x82 , X);
+}
+
+void cpu::TXA()
+{
+    A = X;
+    generate_NCZ_flags(0x82 , A);
+}
+
+void cpu::TXS()
+{
+    S = X;
+}
+
+void cpu::TYA()
+{
+    A = Y;
+    generate_NCZ_flags(0x82 , A);
 }
