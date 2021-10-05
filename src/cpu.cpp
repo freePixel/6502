@@ -384,7 +384,7 @@ void cpu::BRK()
     push_stack((byte)(result % 256));
     push_stack(P);
 
-    PC = 0xfffe;
+    PC = _bus->read(0xfffe) + (byte_2)_bus->read(0xffff)*(byte_2)256;
     P |= 0x04;
 }
 
