@@ -2,6 +2,7 @@
 #define BUS_H
 
 #include "ram.h"
+#include <iostream>
 #include "definitions.h"
 class bus
 {

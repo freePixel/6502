@@ -101,7 +101,7 @@ cpu::cpu(bus* _bus)
     A = 0;
     X = 0;
     Y = 0;
-    PC = 0;
+    PC = 0x0000;
     S = 0xff;
     P = 0;
     wait_cycles = 0;
@@ -217,44 +217,44 @@ byte_2 cpu::find_adress_by_mode(ADR adressing_mode)
         break;
 
         case ADR::ZPY:   
-        read = ((byte_2)_bus->read(PC + 1)) + (byte_2)Y;
+        read = (byte_2)_bus->read(PC + 1) + (byte_2)Y;
         break;
 
         case ADR::ABS:
-        read = ((byte_2)_bus->read(PC + 1) + 256 * (byte_2)_bus->read(PC + 2));
+        read = ((byte_2)_bus->read(PC + 1) + (byte_2)256 * (byte_2)_bus->read(PC + 2));
         break;
 
         case ADR::ABSX:
-        r1 = _bus->read((byte_2)_bus->read(PC+1) + X);
-        if(r1 > 0x00FF) wait_cycles += 1;
-        read = r1 + (byte_2)_bus->read(PC+2)*256;
+        data_memory_adress = (byte_2)_bus->read(PC + 1) + (byte_2)256 * (byte_2)_bus->read(PC + 2);
+        if((data_memory_adress % 256) + (byte_2)X > 0x00ff) wait_cycles++;
+        read = data_memory_adress + (byte_2)X;
         break;
 
         case ADR::ABSY:
-        r1 = _bus->read((byte_2)_bus->read(PC+1) + Y);
-        if(r1 > 0x00FF) wait_cycles += 1;
-        read = r1 + (byte_2)_bus->read(PC+2)*256;
+        data_memory_adress = (byte_2)_bus->read(PC + 1) + (byte_2)256 * (byte_2)_bus->read(PC + 2);
+        if((data_memory_adress % 256) + (byte_2)Y > 0x00ff) wait_cycles++;
+        read = data_memory_adress + (byte_2)Y;
         break;
 
         case ADR::IND:
-        data_memory_adress = _bus->read( _bus->read(PC+2) * 256 + byte_2(_bus->read(PC+1)));
-        read = _bus->read(data_memory_adress) * 256 + _bus->read(data_memory_adress + 1);
+        data_memory_adress = _bus->read(_bus->read(PC+2) * (byte_2)256 + byte_2(_bus->read(PC+1)));
+        read = (byte_2)_bus->read(data_memory_adress) + (byte_2)256 * _bus->read(data_memory_adress + 1);
         break;
 
         case ADR::IMM:
-        read = _bus->read(PC + 1);
+        read = PC + 1;
         break;
 
         case ADR::INDX:
         data_memory_adress = (byte_2)_bus->read(PC + 1) + (byte_2)X;
-        read = 256 * _bus->read(data_memory_adress) + data_memory_adress + Y;
+        read = (byte_2)_bus->read(data_memory_adress) + (byte_2)_bus->read(data_memory_adress + 1) * (byte_2)256;
         break;
 
         case ADR::INDY:
         data_memory_adress = (byte_2)_bus->read(PC+1);
-        intermediate_adress = _bus->read(data_memory_adress) + Y;
-        if(intermediate_adress > 0x00FF) wait_cycles += 1;
-        read = intermediate_adress + 256 * _bus->read(data_memory_adress + 1);
+        r1 = (byte_2)_bus->read(data_memory_adress) + (byte_2)Y;
+        read = r1 + (byte_2)256 * (byte_2)_bus->read(data_memory_adress + 1);
+        if((byte_2)_bus->read(data_memory_adress) + (byte_2)Y > 0x00ff) wait_cycles++;
         break;
     }
     return read;
@@ -379,7 +379,7 @@ void cpu::BIT()
 void cpu::BRK()
 {
 
-    byte_2  result = PC+2;
+    byte_2 result = PC+2;
     push_stack((byte)(result >> 8));
     push_stack((byte)(result % 256));
     push_stack(P);

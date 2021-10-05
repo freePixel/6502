@@ -7,7 +7,7 @@
 class ram
 {
     public:
-
+    ram();
     void write(byte_2 adress , byte data);
     byte read(byte_2 adress);
     private:
