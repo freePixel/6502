@@ -7,7 +7,7 @@ bus::bus()
 
 void bus::write(byte_2 adress , byte data)
 {
-    printf("%02x w %02x \n",adress , data);
+    //printf("%02x w %02x \n",adress , data);
     this->data = data;
 
     if(adress < 0x2000)  //ram adress
@@ -23,7 +23,7 @@ void bus::write(byte_2 adress , byte data)
 
 byte bus::read(byte_2 adress)
 {
-    printf("%02x r %02x \n",adress , _ram.read(adress));
+    //printf("%02x r %02x \n",adress , _ram.read(adress));
     if(adress < 0x2000)
     {
         data = _ram.read(adress);

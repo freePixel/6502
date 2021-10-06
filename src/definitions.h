@@ -5,6 +5,11 @@
 typedef unsigned char byte;
 typedef unsigned short int byte_2;
 
+//timing 
+#define CPU_CLK 1
+#define PPU_CLK 3
+#define SCREEN_FPS 30
+
 #define RAM_FA 0x0000
 #define RAM_LA 0x1fff
 #define IO_FA  0x2000
