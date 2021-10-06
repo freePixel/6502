@@ -10,7 +10,7 @@ class cpu
     public:
     cpu(bus* bus);
     void rising_edge_clk();
-    
+    std::array<int , 7> get_cpu_status();
     private:
 
         static std::map<byte , instruction> opcode_map; //dictionary used to store all opcode info

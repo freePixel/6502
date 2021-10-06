@@ -187,6 +187,11 @@ void cpu::rising_edge_clk()
     }
 }
 
+std::array<int, 7> cpu::get_cpu_status()
+{
+    return {A,X,Y,PC,S,P,OPCODE};
+}
+
 byte cpu::find_operator_by_mode(ADR adressing_mode)
 {
     if(adressing_mode == ADR::ACC)
