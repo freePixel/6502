@@ -1,7 +1,11 @@
 #include <iostream>
 #include "cpu.h"
 #include <thread>
-int main()
+
+#include <SDL2/SDL.h>
+
+
+int main(int argc, char* argv[])
 {
     bus* _bus = new bus();
     cpu* CPU = new cpu(_bus);
