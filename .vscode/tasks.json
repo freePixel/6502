@@ -12,8 +12,11 @@
 				"-o",
 				"${fileDirname}\\main.exe",
 				"-IC:/sdk/SDL2-2.0.16/x86_64-w64-mingw32/include",
+				"-IC:/sdk/x86_64-w64-mingw32/include",
 				"-LC:/sdk/SDL2-2.0.16/x86_64-w64-mingw32/lib",
+				"-LC:/sdk/x86_64-w64-mingw32/lib",
 				"-lmingw32",
+				
 				"-lSDL2main",
 				"-lSDL2"
 			],

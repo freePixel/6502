@@ -7,3 +7,8 @@ screen::screen(cpu* CPU)
     this->renderer = SDL_CreateRenderer(window , -1 , 0);
     this->CPU = CPU;
 }
+
+void screen::update()
+{
+    
+}

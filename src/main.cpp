@@ -2,6 +2,7 @@
 #include "cpu.h"
 #include <thread>
 #include "ppu.h"
+#include "SDL2/SDL_ttf.h"
 
 
 int main(int argc, char* argv[])
