@@ -1,14 +1,14 @@
 #include <iostream>
 #include "cpu.h"
 #include <thread>
-
-#include <SDL2/SDL.h>
+#include "ppu.h"
 
 
 int main(int argc, char* argv[])
 {
     bus* _bus = new bus();
     cpu* CPU = new cpu(_bus);
+    ppu* PPU = new ppu(_bus);
 
     while(true)
     {

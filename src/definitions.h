@@ -37,5 +37,7 @@ struct instruction
     
 };
 
+//PPU DEFINITIONS
+
 
 #endif
