@@ -32,9 +32,10 @@ void screen::draw_cpu()
     SDL_RenderFillRectF(renderer,temp_rect);
     delete temp_rect;
 
-    std::array<int , 8> data = this->CPU->get_cpu_status();
-    std::array<std::string , 8> st = {"A","X","Y","PC","S","P","OP","M[PC]"};
-    for(int i=0;i<8;i++)
+    std::array<int , 11> data = this->CPU->get_cpu_status();
+    std::array<std::string , 11> st = {"A","X","Y","PC","S","P","OP","M[PC-2]","M[PC-1]","M[PC]","M[PC+1]","M[PC+2]"};
+    
+    for(int i=0;i<st.size();i++)
     {
         std::stringstream sstream;
         sstream << std::hex << data[i];
