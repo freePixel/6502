@@ -4,8 +4,8 @@
             "name": "Win32",
             "includePath": [
                 "${default}",
-                "C:\\sdk\\SDL2-2.0.16\\x86_64-w64-mingw32\\include",
-                "C:\\sdk\\x86_64-w64-mingw32\\include"
+                "${workspaceFolder}/sdk/SDL2-2.0.16/x86_64-w64-mingw32/include",
+                "${workspaceFolder}/sdk/SDL2-2.0.16/x86_64-w64-mingw32/lib"
             ],
             "compilerPath": "C:\\msys64\\mingw64\\bin\\gcc.exe",
             "cStandard": "gnu17",
