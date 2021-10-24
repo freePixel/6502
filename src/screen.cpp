@@ -33,7 +33,7 @@ void screen::draw_cpu()
     delete temp_rect;
 
     std::array<int , 11> data = this->CPU->get_cpu_status();
-    std::array<std::string , 11> st = {"A","X","Y","PC","S","P","OP","M[PC-2]","M[PC-1]","M[PC]","M[PC+1]","M[PC+2]"};
+    std::array<std::string , 12> st = {"A","X","Y","PC","S","P","OP","M[PC-2]","M[PC-1]","M[PC]","M[PC+1]","M[PC+2]"};
     
     for(int i=0;i<st.size();i++)
     {
