@@ -15,7 +15,6 @@ class screen
     private:
 
         void draw_cpu();
-        void draw_ppu();
     
 
         SDL_Texture* render_text(std::string text);

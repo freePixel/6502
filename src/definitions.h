@@ -7,7 +7,6 @@ typedef unsigned short int byte_2;
 
 //timing 
 #define CPU_CLK 1
-#define PPU_CLK 3
 #define SCREEN_FPS 30
 
 #define RAM_FA 0x0000
